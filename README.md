@@ -1,5 +1,15 @@
 # Introduction
 
+## TODO:
+1. list of libraries used in the project -> expose this in requirements.txt
+2. Data files included in the repository with a short description
+3. Either:
+   * Summary of analysis results + acknowledgements
+   * if webapp: Project definition, Analysis and Conclusion in readme instead of blog.  
+
+## How to run:
+`Awesome section to come here!`
+
 
 <details><summary>Project rubric</summary>
 
