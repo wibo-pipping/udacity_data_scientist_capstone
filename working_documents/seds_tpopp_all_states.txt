@@ -1,0 +1,52 @@
+SEDS_TPOPP_MO_A::Resident population including Armed Forces, Missouri::Thousand
+SEDS_TPOPP_MN_A::Resident population including Armed Forces, Minnesota::Thousand
+SEDS_TPOPP_MI_A::Resident population including Armed Forces, Michigan::Thousand
+SEDS_TPOPP_ME_A::Resident population including Armed Forces, Maine::Thousand
+SEDS_TPOPP_MD_A::Resident population including Armed Forces, Maryland::Thousand
+SEDS_TPOPP_MA_A::Resident population including Armed Forces, Massachusetts::Thousand
+SEDS_TPOPP_LA_A::Resident population including Armed Forces, Louisiana::Thousand
+SEDS_TPOPP_KY_A::Resident population including Armed Forces, Kentucky::Thousand
+SEDS_TPOPP_KS_A::Resident population including Armed Forces, Kansas::Thousand
+SEDS_TPOPP_IN_A::Resident population including Armed Forces, Indiana::Thousand
+SEDS_TPOPP_IL_A::Resident population including Armed Forces, Illinois::Thousand
+SEDS_TPOPP_ID_A::Resident population including Armed Forces, Idaho::Thousand
+SEDS_TPOPP_IA_A::Resident population including Armed Forces, Iowa::Thousand
+SEDS_TPOPP_HI_A::Resident population including Armed Forces, Hawaii::Thousand
+SEDS_TPOPP_GA_A::Resident population including Armed Forces, Georgia::Thousand
+SEDS_TPOPP_FL_A::Resident population including Armed Forces, Florida::Thousand
+SEDS_TPOPP_DE_A::Resident population including Armed Forces, Delaware::Thousand
+SEDS_TPOPP_DC_A::Resident population including Armed Forces, District of Columbia::Thousand
+SEDS_TPOPP_CT_A::Resident population including Armed Forces, Connecticut::Thousand
+SEDS_TPOPP_CO_A::Resident population including Armed Forces, Colorado::Thousand
+SEDS_TPOPP_US_A::Resident population including Armed Forces, United States::Thousand
+SEDS_TPOPP_TX_A::Resident population including Armed Forces, Texas::Thousand
+SEDS_TPOPP_TN_A::Resident population including Armed Forces, Tennessee::Thousand
+SEDS_TPOPP_SD_A::Resident population including Armed Forces, South Dakota::Thousand
+SEDS_TPOPP_SC_A::Resident population including Armed Forces, South Carolina::Thousand
+SEDS_TPOPP_RI_A::Resident population including Armed Forces, Rhode Island::Thousand
+SEDS_TPOPP_PA_A::Resident population including Armed Forces, Pennsylvania::Thousand
+SEDS_TPOPP_OR_A::Resident population including Armed Forces, Oregon::Thousand
+SEDS_TPOPP_OK_A::Resident population including Armed Forces, Oklahoma::Thousand
+SEDS_TPOPP_OH_A::Resident population including Armed Forces, Ohio::Thousand
+SEDS_TPOPP_NY_A::Resident population including Armed Forces, New York::Thousand
+SEDS_TPOPP_NV_A::Resident population including Armed Forces, Nevada::Thousand
+SEDS_TPOPP_NM_A::Resident population including Armed Forces, New Mexico::Thousand
+SEDS_TPOPP_NJ_A::Resident population including Armed Forces, New Jersey::Thousand
+SEDS_TPOPP_NH_A::Resident population including Armed Forces, New Hampshire::Thousand
+SEDS_TPOPP_NE_A::Resident population including Armed Forces, Nebraska::Thousand
+SEDS_TPOPP_ND_A::Resident population including Armed Forces, North Dakota::Thousand
+SEDS_TPOPP_NC_A::Resident population including Armed Forces, North Carolina::Thousand
+SEDS_TPOPP_MT_A::Resident population including Armed Forces, Montana::Thousand
+SEDS_TPOPP_MS_A::Resident population including Armed Forces, Mississippi::Thousand
+SEDS_TPOPP_WY_A::Resident population including Armed Forces, Wyoming::Thousand
+SEDS_TPOPP_WV_A::Resident population including Armed Forces, West Virginia::Thousand
+SEDS_TPOPP_WI_A::Resident population including Armed Forces, Wisconsin::Thousand
+SEDS_TPOPP_WA_A::Resident population including Armed Forces, Washington::Thousand
+SEDS_TPOPP_VT_A::Resident population including Armed Forces, Vermont::Thousand
+SEDS_TPOPP_VA_A::Resident population including Armed Forces, Virginia::Thousand
+SEDS_TPOPP_UT_A::Resident population including Armed Forces, Utah::Thousand
+SEDS_TPOPP_CA_A::Resident population including Armed Forces, California::Thousand
+SEDS_TPOPP_AZ_A::Resident population including Armed Forces, Arizona::Thousand
+SEDS_TPOPP_AR_A::Resident population including Armed Forces, Arkansas::Thousand
+SEDS_TPOPP_AL_A::Resident population including Armed Forces, Alabama::Thousand
+SEDS_TPOPP_AK_A::Resident population including Armed Forces, Alaska::Thousand
