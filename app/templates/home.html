@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<form method="post">
+    <input type="text" name="ticker_symbol" value=""/>
+    <input type="submit">
+</form>
+
+{% endblock %}
+
+{% block ticker_table %}
+    Ticker symbol: <b>{{ ticker_symbol }}</b>
+    </br>
+    Result: {{ result|safe }}
+{% endblock %}
