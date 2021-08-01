@@ -11,10 +11,10 @@
 To start the webapp on your local machine first make sure the requirements are installed by running: `pip install -r requirements.txt`
 
 Then from the root folder of the directory run:
-`python run.py`
+`python app/main.py`
 
 ### DockerFile to add:
-entrypoint command: uvicorn app.main:app --host 0.0.0.0 --port 5000
+entrypoint command: app/main.py
 
 
 <details><summary>Project rubric</summary>
