@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
 
+
+
 {% block content %}
 <form method="post">
-    <input type="text" name="ticker_symbol" value=""/>
+    <input type="text" name="ticker_symbol" value="", placeholder="Type a ticker symbol"/>
     <input type="submit">
 </form>
 
@@ -11,5 +13,15 @@
 {% block ticker_table %}
     Ticker symbol: <b>{{ ticker_symbol }}</b>
     </br>
-    Result: {{ result|safe }}
+    Result: {{ticker_table | safe}}
+{% endblock %}
+
+{% block candle_plot %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script type="text/javascript">
+    const graphs = {{graphJSON | safe}};
+    const ticker = {{ticker_symbol }};
+    Plotly.plot(ticker, graphs.data ,graphs.layout);
+</script>
+
 {% endblock %}
