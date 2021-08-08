@@ -29,21 +29,10 @@ def get_ticker_data(ticker_symbol: str, start_date: str='2021-01-01', end_date: 
 
     return df
 
-def create_bar_chart():
-    # Create simple barchart to see if this works in webapp world
-    df = pd.DataFrame({
-      'Fruit': ['Apples', 'Oranges', 'Bananas', 'Apples', 'Oranges', 'Bananas'],
-      'Amount': [4, 1, 2, 2, 4, 5],
-      'City': ['SF', 'SF', 'SF', 'Montreal', 'Montreal', 'Montreal']
-      })
-    
-    fig = px.bar(df, x='Fruit', y='Amount', color='City', barmode='group')
 
-    graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
-
-    return graphJSON
-
-def create_line_chart(df: pd.DataFrame, ticker_symbol: str) -> json:
+def generate_line_graph_json(df: pd.DataFrame, ticker_symbol: str) -> json:
+    """Takes a pandas DataFrame, calculates a moving average and returns the graphJSON object to plot a line chart"""
+    # TODO: move out the calculation/Dataframe logic out to its own function
     df['7d_rolling_avg'] = df.rolling(window=7).adj_close.mean()
 
     fig = px.line(df, x=df.index, y='7d_rolling_avg', title=f'7 day rolling average for ticker: {ticker_symbol!r}')
@@ -53,6 +42,7 @@ def create_line_chart(df: pd.DataFrame, ticker_symbol: str) -> json:
     return graphJSON
 
 
+# TODO: evaluate if I want to use this.
 def create_candle_json(df, ticker_symbol):
     fig = go.Figure(data=[
         go.Candlestick(
