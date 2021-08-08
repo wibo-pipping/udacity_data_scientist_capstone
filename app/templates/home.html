@@ -16,12 +16,14 @@
     Result: {{ticker_table | safe}}
 {% endblock %}
 
-{% block candle_plot %}
+{% block linechart %}
+
+<div id='line' class='chart'></div>
+
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script type="text/javascript">
-    const graphs = {{graphJSON | safe}};
-    const ticker = {{ticker_symbol }};
-    Plotly.plot(ticker, graphs.data ,graphs.layout);
+  var graphs = {{ line_graphJSON|safe }};
+  Plotly.plot('line',graphs,{});
 </script>
 
 {% endblock %}

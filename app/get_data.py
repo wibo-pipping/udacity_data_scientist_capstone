@@ -4,6 +4,7 @@ import pandas as pd
 import datetime as dt
 
 import plotly.graph_objects as go
+import plotly.express as px
 
 from plotly.utils import PlotlyJSONEncoder
 
@@ -28,6 +29,29 @@ def get_ticker_data(ticker_symbol: str, start_date: str='2021-01-01', end_date: 
 
     return df
 
+def create_bar_chart():
+    # Create simple barchart to see if this works in webapp world
+    df = pd.DataFrame({
+      'Fruit': ['Apples', 'Oranges', 'Bananas', 'Apples', 'Oranges', 'Bananas'],
+      'Amount': [4, 1, 2, 2, 4, 5],
+      'City': ['SF', 'SF', 'SF', 'Montreal', 'Montreal', 'Montreal']
+      })
+    
+    fig = px.bar(df, x='Fruit', y='Amount', color='City', barmode='group')
+
+    graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
+
+    return graphJSON
+
+def create_line_chart(df: pd.DataFrame, ticker_symbol: str) -> json:
+    df['7d_rolling_avg'] = df.rolling(window=7).adj_close.mean()
+
+    fig = px.line(df, x=df.index, y='7d_rolling_avg', title=f'7 day rolling average for ticker: {ticker_symbol!r}')
+
+    graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
+
+    return graphJSON
+
 
 def create_candle_json(df, ticker_symbol):
     fig = go.Figure(data=[
@@ -37,9 +61,13 @@ def create_candle_json(df, ticker_symbol):
             high=df.high,
             low=df.low,
             close=df.adj_close,
-            name=ticker_symbol)
-            ]
-        )
+            increasing=dict(line=dict(color= '#17BECF')),
+            decreasing=dict(line=dict(color= '#7F7F7F')),
+            name=ticker_symbol
+            )
+        ])
+
+    fig.update_layout(xaxis_rangeslider_visible = False)
 
     graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
 
