@@ -1,13 +1,25 @@
 {% extends "layout.html" %}
 
 
-
 {% block content %}
-<form method="post">
-    <input type="text" name="ticker_symbol" value="", placeholder="Type a ticker symbol"/>
-    <input type="submit">
-</form>
+<div>
+  <form method="post">
+      <input type="text" name="ticker_symbol" value="AAPL", placeholder="Type a ticker symbol"/>
+      <input type="submit">
+  </form>
+</div>
 
+<div>
+  <form method="post">
+    <select name="ticker_symbol_dropdown" method="POST" action="/">
+    {% for ticker in ticker_options %}
+      <option value="{{ ticker }}">{{ ticker }}</option>
+    {% endfor %}
+    </select>
+    <input type="submit">
+  </form>
+</div>
+<br>
 {% endblock %}
 
 {% block ticker_table %}
