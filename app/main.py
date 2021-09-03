@@ -3,29 +3,31 @@ from get_data import get_ticker_data, generate_line_graph_json
 
 app = Flask(__name__)
 
+# Define the supported tickers
+TICKERS = ['AAPL','GOOG','MSFT']
+
+
 @app.route('/', methods=["GET"])
 def home():
     """
     Displays the homepage.
     """
-    tickers = ['AAPL','GOOG','MSFT']
 
-    return render_template('home.html', ticker_options = tickers)
+    return render_template('home.html', ticker_options=TICKERS)
 
 @app.route('/', methods=['POST'])
 def process_request():
-    ticker_symbol = request.form.get('ticker_symbol', None)
-    ticker_symbol_dropdown = request.form.get('ticker_symbol_dropdown',None)
+    print(request)
 
-    if not ticker_symbol:
-        ticker_symbol = ticker_symbol_dropdown
+    ticker_symbol = request.form.get('ticker_symbol',None)
 
     df = get_ticker_data(ticker_symbol)
-    ticker_table = df.tail(10).loc[:,['adj_close']].T.to_html()
+    ticker_table = df.tail(10).loc[:,['adj_close']].T.to_html() ## TODO: turn this into a proper table
 
     line_graphJSON = generate_line_graph_json(df, ticker_symbol)
 
-    return render_template('home.html', 
+    return render_template('home.html',
+                           ticker_options=TICKERS, 
                            ticker_symbol=ticker_symbol,
                            ticker_table=ticker_table,
                            line_graphJSON = line_graphJSON
