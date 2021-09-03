@@ -17,6 +17,16 @@ Then from the root folder of the directory run:
 entrypoint command: app/main.py
 
 
+### Forcasting analysis
+- For the forecasting of the stock prices the [facebook prophet](https://pypi.org/project/fbprophet/) package was used.
+- Grid search to identify a general range for param optimisation. For more on this please read [Forecasting parameter tuning](forecasting_parameter_tuning.md)
+
+
+The current forecasting approach is very naïve as it only looks at historic adjusted closing rates and ignores any forms of reports, quarterly updates from the companies or prospects shared by the company. Next to this it only forecasts the expected adjusted close value for the stocks, which does not take into account scheduled divident payouts or stock splits, which influcence the adjusted closing price.
+
+
+
+
 <details><summary>Project rubric</summary>
 
 #### Project definition
