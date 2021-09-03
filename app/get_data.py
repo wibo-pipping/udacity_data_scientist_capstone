@@ -10,10 +10,10 @@ from plotly.utils import PlotlyJSONEncoder
 
 from typing import Optional
 
-DEFAULT_END_DATE = dt.date.today().strftime('%Y-%m-%d')
+TODAY = dt.date.today().strftime('%Y-%m-%d')
 
 
-def get_ticker_data(ticker_symbol: str, start_date: str='2021-01-01', end_date: str=DEFAULT_END_DATE) -> pd.DataFrame:
+def get_ticker_data(ticker_symbol: str, start_date: str='2021-01-01', end_date: str=TODAY) -> pd.DataFrame:
     """Retrieve the data through the yahoo finance API between start and end dates and return a pandas DataFrame with
     the adjusted close values per day. Return the dataframe with the downloaded data
 
@@ -27,15 +27,22 @@ def get_ticker_data(ticker_symbol: str, start_date: str='2021-01-01', end_date: 
 
     df.columns = df.columns.str.lower().str.replace(' ','_')
 
+    # TODO: move out the calculation/Dataframe logic out to its own function
+    df['7d_rolling_avg'] = df.rolling(window=7).adj_close.mean()
+
     return df
 
 
 def generate_line_graph_json(df: pd.DataFrame, ticker_symbol: str) -> json:
-    """Takes a pandas DataFrame, calculates a moving average and returns the graphJSON object to plot a line chart"""
-    # TODO: move out the calculation/Dataframe logic out to its own function
-    df['7d_rolling_avg'] = df.rolling(window=7).adj_close.mean()
-
+    """Takes a pandas DataFrame and generates the graphJSON object needed to plot a line chart"""
+    
     fig = px.line(df, x=df.index, y='7d_rolling_avg', title=f'7 day rolling average for ticker: {ticker_symbol!r}')
+
+    # Add vertical line for today
+    fig.add_vline(x=TODAY, line_width=1, line_dash='dot', line_color='#e377c2')
+
+    # TODO:
+    ## Change line color for historic data vs forecasted data
 
     graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
 
