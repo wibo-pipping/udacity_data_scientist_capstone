@@ -6,42 +6,56 @@ import plotly.express as px
 
 from plotly.utils import PlotlyJSONEncoder
 
-from common import get_today_date_str
+from common import get_today_epoch
 
 
-def generate_line_graph_json(df: pd.DataFrame, ticker_symbol: str) -> json:
+def generate_line_graph_json(df: pd.DataFrame, ticker_symbol: str, n_days_forecasted: int=180) -> json:
     """Takes a pandas DataFrame and generates the graphJSON object needed to plot a line chart"""
-    
-    fig = px.line(df, x=df.index, y='7d_rolling_avg', title=f'7 day rolling average for ticker: {ticker_symbol!r}')
+
+    fig = px.line(df,
+                x=df.index,
+                y='7d_rolling_avg',
+                title=f'Stock price for {ticker_symbol}, forecasted to {n_days_forecasted} days into the future',
+                labels={'index':'Date','7d_rolling_avg': 'Stock adjusted close ($)'},
+                color_discrete_sequence=['#7d0c5b']
+                )
+
+    # Update the trace to display legend and format the hoverover field
+    fig.update_traces(hovertemplate = '<b>Historic data</b><br>Date: %{x}<br>Stock adjusted close: $%{y}',
+                  name='Historic data',
+                  showlegend=True
+                 )
+
+
 
     # Add vertical line for today
-    fig.add_vline(x=get_today_date_str(), line_width=1, line_dash='dot', line_color='#e377c2')
+    fig.add_vline(x=get_today_epoch(),
+                line={
+                    'width':1.5,
+                    'dash':'dot',
+                    'color':'#e377c2'
+                    },
+                annotation_text='Today'
+                )
 
-    # TODO:
-    ## Change line color for historic data vs forecasted data
+    # Add scatter trace for forecasted data
+    fig.add_trace(
+    go.Scatter(
+        x=df.iloc[-n_days_forecasted:].ds,
+        y=df.iloc[-n_days_forecasted:].yhat,
+        mode='markers',
+        marker={
+            'color': '#ebb2da',
+            'symbol': 'hexagon2',
+            'size': 10
+        },
+        opacity=1,
+        name='Forecasted value',
+        hovertemplate = '<b>Forecasted</b><br>Date: %{x}<br>Stock adjusted close: $%{y}'
+        )
+    )
 
     graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
 
     return graphJSON
-
-
-# TODO: evaluate if I want to use this.
-def create_candle_json(df, ticker_symbol):
-    fig = go.Figure(data=[
-        go.Candlestick(
-            x=df.index,
-            open=df.open,
-            high=df.high,
-            low=df.low,
-            close=df.adj_close,
-            increasing=dict(line=dict(color= '#17BECF')),
-            decreasing=dict(line=dict(color= '#7F7F7F')),
-            name=ticker_symbol
-            )
-        ])
-
-    fig.update_layout(xaxis_rangeslider_visible = False)
-
-    graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
-
-    return graphJSON
+    
