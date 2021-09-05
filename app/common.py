@@ -1,6 +1,6 @@
 import datetime as dt
 
-DATE_FORMAT = '%Y-%m-%d''
+DATE_FORMAT = '%Y-%m-%d'
 
 
 def get_today_date_str():
