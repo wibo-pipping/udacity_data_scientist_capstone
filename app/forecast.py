@@ -27,7 +27,7 @@ def forecast_data(df: pd.DataFrame, ticker_symbol: str, forecast_column: str='ad
 def get_prophet_params(ticker_symbol: str) -> dict:
     """Read the parameters for prophet from disk and select the params for the current ticker"""
     
-    with open('models/prophet_params.json','r') as f:
+    with open('params/prophet_params.json','r') as f:
         all_params = json.load(f)
     
     prophet_params = all_params.get(ticker_symbol, {})
