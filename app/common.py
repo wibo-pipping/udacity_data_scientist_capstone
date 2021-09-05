@@ -1,6 +1,14 @@
 import datetime as dt
+import json
 
 DATE_FORMAT = '%Y-%m-%d'
+
+def get_supported_tickers():
+    """Read a json file with properties per ticker. Return list of tickers"""
+    with open('models/prophet_params.json') as f:
+        d_ = json.load(f)
+
+    return list(d_.keys())
 
 
 def get_today_date_str():
