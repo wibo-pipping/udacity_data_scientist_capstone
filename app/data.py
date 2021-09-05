@@ -5,7 +5,7 @@ import pandas as pd
 from common import get_today_date_str
 
 
-def get_clean_ticker_data(ticker_symbol: str, start_date: str='2020-01-01', end_date:str=get_today_date_str()) -> pd.DataFrame:
+def get_clean_ticker_data(ticker_symbol: str, start_date: str='2019-01-01', end_date:str=get_today_date_str()) -> pd.DataFrame:
     """Retrieve the ticker data between start and end dates and return a DataFrame with cleaned and enriched data.
 
     Keyword arguments:
