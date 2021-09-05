@@ -2,11 +2,12 @@ from flask import Flask, render_template, request, jsonify
 from data import get_clean_ticker_data
 from graph import generate_line_graph_json
 from forecast import forecast_data
+from common import get_supported_tickers
 
 app = Flask(__name__)
 
 # Define the supported tickers
-TICKERS = ['AAPL','GOOG','MSFT']
+TICKERS = get_supported_tickers()
 
 
 @app.route('/', methods=["GET"])
