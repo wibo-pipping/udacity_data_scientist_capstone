@@ -9,7 +9,7 @@ To start the webapp on your local machine first make sure the requirements are i
 Then from the root folder of the directory run:
 `python app/main.py`
 
-The web app should now be running and available on `[http://192.168.0.182:5000/](http://192.168.0.182:5000/)`.
+The web app should now be running and available on [`http://192.168.0.182:5000/`](http://192.168.0.182:5000/).
 
 ## Project definition
 > Investment firms, hedge funds and even individuals have been using financial models to better understand market behavior and make profitable investments and trades. A wealth of information is available in the form of historical stock prices and company performance data, suitable for machine learning algorithms to process.
