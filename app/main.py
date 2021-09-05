@@ -19,17 +19,18 @@ def home():
 
 @app.route('/', methods=['POST'])
 def process_request():
-    print(request)
 
     ticker_symbol = request.form.get('ticker_symbol',None)
 
+    # Download the data
     df = get_clean_ticker_data(ticker_symbol)
     ticker_table = df.tail(10).loc[:,['adj_close']].T.to_html() ## TODO: turn this into a proper table
 
-    line_graphJSON = generate_line_graph_json(df, ticker_symbol)
-
-
+    # Forecast the data
     forecast = forecast_data(df, ticker_symbol)
+
+    # Get graph object
+    line_graphJSON = generate_line_graph_json(forecast, ticker_symbol)
 
     return render_template('home.html',
                            ticker_options=TICKERS, 
