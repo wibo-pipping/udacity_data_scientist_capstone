@@ -29,7 +29,7 @@ def generate_line_graph_json(df: pd.DataFrame, ticker_symbol: str, n_days_foreca
 
 
     # Add vertical line for today
-    fig.add_vline(x=get_today_epoch(),
+    fig.add_vline(x=get_today_epoch(), # Use epoch here to escape bug in Plotly
                 line={
                     'width':1.5,
                     'dash':'dot',
@@ -41,7 +41,7 @@ def generate_line_graph_json(df: pd.DataFrame, ticker_symbol: str, n_days_foreca
     # Add scatter trace for forecasted data
     fig.add_trace(
     go.Scatter(
-        x=df.iloc[-n_days_forecasted:].ds,
+        x=df.iloc[-n_days_forecasted:].ds, # only include forecasted data
         y=df.iloc[-n_days_forecasted:].yhat,
         mode='markers',
         marker={
@@ -58,4 +58,3 @@ def generate_line_graph_json(df: pd.DataFrame, ticker_symbol: str, n_days_foreca
     graphJSON = json.dumps(fig, cls=PlotlyJSONEncoder)
 
     return graphJSON
-    
