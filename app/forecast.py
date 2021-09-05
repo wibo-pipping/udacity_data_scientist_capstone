@@ -19,6 +19,7 @@ def forecast_data(df: pd.DataFrame, ticker_symbol: str, forecast_column: str='ad
     forecast = forecast_with_prophet(df[['ds','y']], prophet_params=model_params)
 
     result = df.merge(forecast, on='ds', how='outer')
+    result = result.set_index('ds', drop=False)
 
     return result
 
