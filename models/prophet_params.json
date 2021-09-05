@@ -1,0 +1,1 @@
+{"AAPL": {"changepoint_prior_scale": 0.45, "changepoint_range": 0.9, "seasonality_prior_scale": 10}}
