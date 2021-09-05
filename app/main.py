@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from data import get_clean_ticker_data
 from graph import generate_line_graph_json
+from forecast import forecast_data
 
 app = Flask(__name__)
 
@@ -26,6 +27,9 @@ def process_request():
     ticker_table = df.tail(10).loc[:,['adj_close']].T.to_html() ## TODO: turn this into a proper table
 
     line_graphJSON = generate_line_graph_json(df, ticker_symbol)
+
+
+    forecast = forecast_data(df, ticker_symbol)
 
     return render_template('home.html',
                            ticker_options=TICKERS, 
