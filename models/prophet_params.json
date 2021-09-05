@@ -1,1 +1,7 @@
-{"AAPL": {"changepoint_prior_scale": 0.45, "changepoint_range": 0.9, "seasonality_prior_scale": 10}}
+{
+"AAPL": {"changepoint_prior_scale": 0.45, "changepoint_range": 0.9, "seasonality_prior_scale": 10},
+"MSFT": {"changepoint_prior_scale": 0.05, "changepoint_range": 1.0, "seasonality_prior_scale": 5},
+"AMZN": {"changepoint_prior_scale": 0.35, "changepoint_range": 0.8, "seasonality_prior_scale": 10},
+"ASML": {"changepoint_prior_scale": 0.05, "changepoint_range": 0.8, "seasonality_prior_scale": 20},
+"GOOG": {"changepoint_prior_scale": 0.15, "changepoint_range": 0.9, "seasonality_prior_scale": 2}
+}
