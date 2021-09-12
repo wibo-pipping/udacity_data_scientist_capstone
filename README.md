@@ -1,6 +1,17 @@
 # Introduction - Stock Price Indicator
 This repository contains all the code required to get a webapp running that uses facebook prophet to predict the stock price for a limited number of tickers. Current ticker supported are `AAPL`, `GOOG`, `MSFT`, `AMZN`, and `ASML`.
 
+## Extending supported tickers
+Supported tickers are read from [prophet_params.json](./params/prophet_params.json) at startup of the webapp. To extend supported trackers include them in the prophet_params.json and restart the webapp. Adding the tickers can be done by adding a valid JSON object with supported facebook prophet params, example:
+
+```json
+{"NEW_TICKER_NAME": {
+   "changepoint_prior_scale": 0.45,
+   "changepoint_range": 0.9,
+   "seasonality_prior_scale": 10
+   }
+}
+```
 
 ## How to run:
 Requires python 3.8 or higher to run
@@ -128,6 +139,10 @@ This notebook is the basis for the full project and as the project was moving al
 - seds_tpopp_all_states.txt; Reference from the Quandle API to get energy consumption data per state. 
 
 
+
+
+
+### Refinement
 #### Training the forecast model with prophet
 To get the estimates [facebook prophet](https://pypi.org/project/fbprophet/) was used to estimate the value of stock tickers up to 180 days ahead. The data for a select set of tickers was downloaded:
 - `AAPL`; Apple
@@ -146,14 +161,19 @@ The selection for this tickers was made to a selection of a few large tech compa
 - Create estimates for the ticker
 - Evaluate model using a period of data that was left out, in this case 180 days
 
-The results for the default parameters ranged from very good (~10% MAPE) to very bad (~50% MAPE). After looking at the data this is where the decision was made to train the models per ticker symbol to get the best performing model per ticker. The different ticker symbols from different industries showed that they require a wildly different set of parameters to get some performance.
+The results for the default parameters ranged from very good (~10% MAPE) to very bad (~50% MAPE). After looking at the data this is where the decision was made to train the models per ticker symbol to get the best performing model per ticker. The different ticker symbols from different industries showed that they require a wildly different set of parameters to get some performance. See [Refinement](#refinement) for model improvements.
 
 During this initial fitting phase one of the parameters that turned out to be a strong contributer to prediction was the yearly seasonality. Yearly seasonality only works if there is atleast 1.5 years of data available. **This is why the minimum start date by default is set to 2019-01-01** for the retrieve data function.
 
 The next step was to use a grid search to identify a general range for param optimisation. For more on this please read [Forecasting parameter tuning](forecasting_parameter_tuning.md) The Mean Abosolute Percentage Error (`MAPE`) was used to evaluate model performance during the grid search. See [Metrics](#metrics) for the formula.
 
 
-### Refinement
+<img src="./assets/ohlc_chart_example.svg" style="float: right"></img>
+
+### Improving the visualisation
+As this is stock data an candle plot or OHLC plot would be a nice fit as it not only shows the latest value of the stock, it also gives some information on the volatility of the stock over time. The intial attempts in Bokeh where quite straight forward as there is an out-of-the-box option for such a plot. Even after swapping plotting library to Plotly the OHLC plot in a local notebook worked like a charm. Unfortunately this hit a bit of a roadblock when it comes to passing the JSON object through Flask to render the same plot in the webapp.
+
+This made me rethink the visualisation I wanted to do and I ended up with updating the visualisation, replacing the OHLC plot with a line chart displaying the 7-day moving average. This shows the trend of a stock much more clearly as it removes some potential high outliers. After the initial visualisation was up an running, and the forecasting data was added as points the visualisation was enchanced by picking complementary colors and adding a vertical line for the date of today, the date from where the forecast starts.
 
 
 ## Results
