@@ -213,19 +213,29 @@ This prompted me to bump the amount of historic data to include in the final mod
 ### Reflection
 The webapp presented here successfully displays an estimated adjusted close price for a stock of interest for the next 180 days. It provides the user with an interface to provide input and get output, collects required data from open data sources and uses optimized parameters to adjust the model on the fly. To top it off the output is an easy to consume line graph, displaying trends and providing a powerful overview to make decisions.
 
+I'm happy with the decoupling between the different parts of the application I built in. It is possible to swap out models without touching the actual visualisation code, as long as you adhere to the contracts. It currently is a soft coupling, so this could be improved in a next iterations by making the contracts/protocols more explicit, although that hinges more towards strong software engineering practices.
+
 In the start up phase of the project I had some trouble scoping out the project. There is pressure on producing something you are proud off, and as I tend to put the bar really high that led to a somewhat slow start to implementation. Part of the decisions made at the start, like trying new libraries and frameworks Bokeh and FastAPI over material covered by the course, ended up eating up a lot of time. In the end I am quite proud on what the webapp can do now, eventhough I still think the functionality is limited and the models used to get the actual estimated values naive.
 
 The other thing I found hard was the model optimisation. I have used prophet before and its a really great tool when it comes to forecasting, it is very hard to outdo it with custom home-made ARIMA, SARIMA or SARIMAX models. That said, the different stocks all behave very differently, indicating that a general model for this type of data tends to not work well. This combined with some of the somewhat complicated cross-validation for temporal data made implementing the grid search quite interesting.
 
 
-
 ### Improvement
 
-The current forecasting approach is very naïve as it only looks at historic adjusted closing rates and ignores any forms of reports, quarterly updates from the companies or prospects shared by the company. Next to this it only forecasts the expected adjusted close value for the stocks, which does not take into account scheduled divident payouts or stock splits, which influcence the adjusted closing price.
+#### Naïve models
+The current forecasting approach is very naïve as it only looks at historic adjusted closing rates and ignores any forms of reports, quarterly updates from the companies or prospects shared by the company. Next to this it only forecasts the expected adjusted close value for the stocks, which does not take into account scheduled divident payouts or stock splits, which influcence the adjusted closing price. Additionally, the stock market reacts to what is going on in the world. Not only governments introducting laws, taxes or results from elections but also wars, natural disasters and the overall confidence in the economy by "we, the people" all have their influnce on the stock markets. None of these are currently included in the model.
 
-Additionally, the stock market reacts to what is going on in the world. Not only Governments introducting laws, taxes or results from elections but also wars, natural disasters and the overall confidence in the economy by "we, the people" all have their influnce on the stock markets. None of these are currently included in the model, assuming they don't operate on some interesting seasonal pattern.
+This is a direct result of using facebook prophet as the ML model. One interesting thought experiment is if you could actually model all of this complex real world interactions and capture them in the prophet models as change points, or interesting season patterns that operate on their own cycle. Elections for example, in the US these happen every four years and they might have a four-year cycle instead of the yearly cycle prophet assumes.
 
+#### Adding template to extend supported tickers & influence estimate
+Currently the UI is very limited in that it only allows the user to select a ticker and get a visualisation + estimate. It doesn't have any way to set a date range of interest, no way to extend to horizon or length of the estimate you get returned as a user. Additonally you currently can only add tickers from the backend and it requires a webapp restart.
 
+I would love to add a page where you can add other tickers for which there is no model yet. Doing this would need the gridsearch to be available as a function to the webapplication. As the gridsearch took a very long time to run on my local computer (~6 hours) this functionality should be supported with an asynchronous functionality and ideally some notification when it is done so the user can come back and have a look at their new ticker.
+
+Influencing the date range of interest could be a more dynamic by providing a input field to pick how large the estimate should be. I don't think adding support for changing the historic date range will help the model improvement as we have seen above that the models require enough data to get seasonal trends down. As this is expert knowledge and I would like to keep the UI easy and friendly this won't be supported.
+
+#### Portfolio overview & recommendation engine
+Currently the app is a one time use, it doesn't remember the state and it doens't have any support to build a portfolio for a user. This would be a very nice feature to add. To achieve this it requires an additional module that takes care of creating user accounts. Furthermore, it requires a database that know when a stock was purchased and a what price. Next it requires the implementation of business logic to determine if it should recommend to sell or buy more of the stock. This by itself could be a project.
 
 
 <details><summary>Project rubric</summary>
