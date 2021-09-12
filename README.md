@@ -34,33 +34,28 @@ To evaluate the model performance the Mean Absolute Percentage Error (MAPE) scor
 - *A<sub>t</sub>* the actual value
 - *F<sub>t</sub>* the forecasted value
 
+As the problem is a time series problem, simple cross validation is not an option as that does not take into account the temporal aspect of the data. In stead, the models are evaluated on the full data set minus the last forecast horizon of data. 
 
 
 
-1. A framework that can host a webapp to interact with
-   - The webapp needs an interactive element, to pick the stock for example
-   - The webapp needs to be able to visualise and display the historic and expected stock prices
-2. The webapp needs to be able to download historic stock ticker data from a provided endpoint, in this case Yahoo! finance was used.
-   - The stock market isn't trading on all days, see if the endpoint provides daily values.
-3. A ML model to take the historic data and predict the future stockprices
-   - The model needs to be evaluated with an error measure to make sure it doesn't overfit on a specific stock
-   - As the data is timeseries, evaluating with cannot be done on just a random sample as the order of the data matters
+## Data Exploration & Visualisation
 
+### Evaluating and selecting data API for historic data
+For the data APIs both [Quandl](https://www.quandl.com/) and [Yahoo! Finance](https://finance.yahoo.com/) where evaluated, both through the python packages available online. Both of the APIs provide very similar data in a somewhat different structure. Yahoo!'s API was selected over Quandl with the main reason being it was easier to use and it does not require any login or API key.
 
+### Historic data investigation
+Downloading the data for one ticker symbol through the API for a period of a year returns a pandas DataFrame, making it very conventient to process it after. The data set includes the Date, the Open, High, Low, Close, Adj Close and Trading Volume. For this project we will only be using the Date and Adj Close columns.
 
+The Date field is set as the index and inspection shows its loaded as a DatetimeIndex, conventient as this opens up out-of-the-box pandas time series functions like the `window()` and `resample()` functions
 
-## Analysis
+After downloading the shape of the DataFrame was checked, where the expected number of rows should be 365, 1 row for each day, this returned 252. There are some missing rows. Closer inspectection on the data shows that its mostly weekends and some holidays that are missing, this makes sense as on theses days the stock market is closed.
 
-### Data Exploration
+There are no duplicate date values, and all columns are floats with the only exception being the Volume, which is an integer. There are no missing values for the ticker symbol (`GOOG`) inspected.
 
-#### Getting the data through APIs
-For the data APIs I explored both [Quandl](https://www.quandl.com/) and [Yahoo! Finance](https://finance.yahoo.com/), both through the python packages available online. The Yahoo had my preference as it didn't require a log in, reducing the need to come up with a way to hide these and it allowed my app to be open on the internet without the need for others that want to use it to register.
+### Line graph visualisation
+As this is time series data with an interest in daily values, a line chart was selected to display both the historic and estimated data.
 
-Right around the time I was ready to start implementing the API, Yahoo updated the response of their API, breaking all the API calls and resulting in error messages on download. Luckily the python package is well maintained and it was updated quickly.
-
-
-### Data Visualisation
-
+![alt text](assets/plotly_example_visualisation.png "MSFT ticker symbol example")
 
 
 ## Methodology
