@@ -11,13 +11,32 @@ Then from the root folder of the directory run:
 
 The web app should now be running and available on [`http://192.168.0.182:5000/`](http://192.168.0.182:5000/).
 
-## Project definition
-> Investment firms, hedge funds and even individuals have been using financial models to better understand market behavior and make profitable investments and trades. A wealth of information is available in the form of historical stock prices and company performance data, suitable for machine learning algorithms to process.
 
-For this project, a webapp stock price predictor that takes daily trading data over a certain date range as input, and outputs projected estimates for 180 days into the future was made.
+## Project Definition
+For this project, a stock price predictor using daily historic trading data to estimate the stock **adjusted close** value in the next 180 days was implemented. An interactive webapp serves as a user interface to pick a stock of interest and plot both the historic and future value on screen in a line chart.
 
-### Overview of required sections
-In order for this project to be a success a few elements are needed:
+This project can be divided in three major parts:
+1. A ML model to predict the stock ticker prices
+2. Collection and preprocessing of data for the model
+3. A webapplication to collect user input and visualise the output of the ML model
+   
+For the ML part of the project [facebook prophet](https://pypi.org/project/fbprophet/) was used to create the forecasts. Stock ticker data is retrieved from [Yahoo! Finance](https://finance.yahoo.com/) to get the adjusted close values. The webapplication was implemented using a combination of [Flask](https://flask.palletsprojects.com/en/2.0.x/) for the framework and Plotly for the visualisation.
+
+
+### Problem Statement
+Estimate the Adjusted Close price of stock based on historical daily trading data over a certain date range. The stock ticker symbol and date range are input for the model to return estimated prices.
+
+### Metrics
+To evaluate the model performance the Mean Absolute Percentage Error (MAPE) score was used.
+
+![alt text](assets/mape_score_formula.png "MAPE score formula")
+- *n* being the number of times the summation iteration happens
+- *A<sub>t</sub>* the actual value
+- *F<sub>t</sub>* the forecasted value
+
+
+
+
 1. A framework that can host a webapp to interact with
    - The webapp needs an interactive element, to pick the stock for example
    - The webapp needs to be able to visualise and display the historic and expected stock prices
@@ -27,6 +46,55 @@ In order for this project to be a success a few elements are needed:
    - The model needs to be evaluated with an error measure to make sure it doesn't overfit on a specific stock
    - As the data is timeseries, evaluating with cannot be done on just a random sample as the order of the data matters
 
+
+
+
+## Analysis
+
+### Data Exploration
+
+#### Getting the data through APIs
+For the data APIs I explored both [Quandl](https://www.quandl.com/) and [Yahoo! Finance](https://finance.yahoo.com/), both through the python packages available online. The Yahoo had my preference as it didn't require a log in, reducing the need to come up with a way to hide these and it allowed my app to be open on the internet without the need for others that want to use it to register.
+
+Right around the time I was ready to start implementing the API, Yahoo updated the response of their API, breaking all the API calls and resulting in error messages on download. Luckily the python package is well maintained and it was updated quickly.
+
+
+### Data Visualisation
+
+
+
+## Methodology
+
+
+### Data Preprocessing
+
+
+### Implementation
+
+
+### Refinement
+
+
+## Results
+
+### Model Evaluation and Validation
+
+
+### Justification
+
+
+
+## Conclusion
+
+### Reflection
+
+
+### Improvement
+
+
+
+
+
 ### Picking a framework for the webapp
 Initally [FastAPI](https://fastapi.tiangolo.com/) was explored as the framework to use. FastAPI offers rapid development of webapps in python and as its based on Pydantic it comes with very strong documentation possibilities through OpenAPI documentation pages. For visualisation [bokeh](https://docs.bokeh.org/en/latest/index.html) had my interest for visualising the data. The bokeh python package is a wrapper around the very powerful D3 Javascript library, opening the possibilites for some fun visualisations like a OHLC or candlestick graph. This combination proved to be quite troublesome as bokeh has quite a steep learning curve and FastAPI as a webframework is relatively young so there aren't as many online resource available compared to the popular [Flask](https://flask.palletsprojects.com/en/2.0.x/).
 
@@ -34,10 +102,7 @@ This quickly led to a refactor from FastAPI to Flask, but still with bokeh as th
 
 After giving the candle stick visualisation a go with Flask+Plotly it became clear that the webrendering template for Flask was lacking support for the candle stick graph. This required an approach to pre-render the full webpage or build a full backend server setup. This was outside of the scope of the current project, as the ML part also would requier some attention soon. This led to the decision of exposing the results as a line + scatter plot instead.
 
-### Getting the data through APIs
-For the data APIs I explored both [Quandl](https://www.quandl.com/) and [Yahoo! Finance](https://finance.yahoo.com/), both through the python packages available online. The Yahoo had my preference as it didn't require a log in, reducing the need to come up with a way to hide these and it allowed my app to be open on the internet without the need for others that want to use it to register.
 
-Right around the time I was ready to start implementing the API, Yahoo updated the response of their API, breaking all the API calls and resulting in error messages on download. Luckily the python package is well maintained and it was updated quickly.
 
 ### Forcasting analysis
 - For the forecasting of the stock prices the [facebook prophet](https://pypi.org/project/fbprophet/) package was used.
