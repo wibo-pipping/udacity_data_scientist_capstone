@@ -174,21 +174,49 @@ As this is stock data an candle plot or OHLC plot would be a nice fit as it not 
 This made me rethink the visualisation I wanted to do and I ended up with updating the visualisation, replacing the OHLC plot with a line chart displaying the 7-day moving average. This shows the trend of a stock much more clearly as it removes some potential high outliers. After the initial visualisation was up an running, and the forecasting data was added as points the visualisation was enchanced by picking complementary colors and adding a vertical line for the date of today, the date from where the forecast starts.
 
 Example Open, High, Low, Close (OHLC) chart
-<img src="./assets/ohlc_chart_example.svg" style="float: right"></img>
+![Example Open, High, Low, Close (OHLC) chart](./assets/ohlc_chart_example.svg "Example Open, High, Low, Close (OHLC) chart")
 
 
 ## Results
 
-### Model Evaluation and Validation
+### Model Evaluation & Validation 
+The facebook prophet models where trained using a gridsearch. After an initial inspection a set of three parameters where picked to optimize `changepoint_prior_scale`, `changepoint_range`, and `seasonality_prior_scale`. These values influence how heavy a change point in the trend should weigh, how much data to use to determine changepoints and how heavy the seasonality aspect should factor in the fine estimation.
 
+For the parameter grid to investigate the below values where picked, based on the default values prophet sets. For each of the param ranges both lower and higher values where picked. 
+
+```json
+{
+   "changepoint_prior_scale":[0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50],
+   "yearly_seasonality":["auto"],
+   "seasonality_prior_scale":[2, 5, 10, 20],
+   "changepoint_range": [0.8, 0.9, 1.0]
+}
+```
+<sub>*The yearly seasonality was set to auto, but due to the range of the input this was always true</sub>
+
+All of the data was trained on the full set minus the last 180 day horizon. The evaluation below is visualised as heatmaps to make it easier to spot correlations. After the initial performace evaluation `AGN.AS`, `GLPG` and `AKZA.AS` where dropped from the supported ticker list. The current set of parameters did not work for these symbols and as the decision was made to train one model per ticker this doesn't influence the actual model, only the list of supported tickers.
+
+![Average evaluation output](./assets/output_4_0.png)
+
+As can be seen in the heatmap, the tickers have different preferences to what influences their performance. `AAPL` shows a better performance for a higher value of the changepoint range and a higher value than default for the changepoint prior scale whereas `MSFT` best performing param sets have the lowest possible values for changepoint prior scale. In the end the decision to make one model per ticker was made based on the heatmap, showing that the average value for all has a poor performance for half of the tickers included in the list.
 
 ### Justification
 
+Why some models worked better than others might have something to do with the age of the companies & the industry they operate in. For example tech companies saw a huge spike in their results as a result of the Covid lockdowns and overall consumers relying more heavily on the products and services they provided while other industries suffered (like the air travel industry). For example, see the image below, prophet thinks the value of the stock is going to drop heavily (orange line) as that is what happend the year prior to it. This is actually an artifact from not enough historic data (2020-01-01 onward).
 
+![Forecast yearly](./assets/forecast_wthout_yearly.png)
+
+This prompted me to bump the amount of historic data to include in the final model to get it from 2019-01-01 onward and battle some of the pandamic issues we see on the stock market specifically.
 
 ## Conclusion
 
 ### Reflection
+The webapp presented here successfully displays an estimated adjusted close price for a stock of interest for the next 180 days. It provides the user with an interface to provide input and get output, collects required data from open data sources and uses optimized parameters to adjust the model on the fly. To top it off the output is an easy to consume line graph, displaying trends and providing a powerful overview to make decisions.
+
+In the start up phase of the project I had some trouble scoping out the project. There is pressure on producing something you are proud off, and as I tend to put the bar really high that led to a somewhat slow start to implementation. Part of the decisions made at the start, like trying new libraries and frameworks Bokeh and FastAPI over material covered by the course, ended up eating up a lot of time. In the end I am quite proud on what the webapp can do now, eventhough I still think the functionality is limited and the models used to get the actual estimated values naive.
+
+The other thing I found hard was the model optimisation. I have used prophet before and its a really great tool when it comes to forecasting, it is very hard to outdo it with custom home-made ARIMA, SARIMA or SARIMAX models. That said, the different stocks all behave very differently, indicating that a general model for this type of data tends to not work well. This combined with some of the somewhat complicated cross-validation for temporal data made implementing the grid search quite interesting.
+
 
 
 ### Improvement
