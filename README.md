@@ -81,7 +81,7 @@ After giving the candle stick visualisation a go with Flask+Plotly it became cle
 
 
 ### Data Preprocessing
-
+Data preprocessing is only necessary on the historic data retrieved through the [Yahoo! Finance API](https://finance.yahoo.com/). As mentioned in [above](#historic-data-investigation), the data from the API suffers from missing days of data due to the stock markets being closed. To fill in the missing data  `resample('D')` was used to generate the missing days of data in the dataframe. This creates NULL values for the days with missing data. As the markets are closed on these days we assume the Adj close prices do not change during this days. Therefore we can use the last known value to fill the missing values, for this the `.ffill()` function is used to carry forward the last known closing prices.
 
 ### Implementation
 
