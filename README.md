@@ -37,7 +37,6 @@ To evaluate the model performance the Mean Absolute Percentage Error (MAPE) scor
 As the problem is a time series problem, simple cross validation is not an option as that does not take into account the temporal aspect of the data. In stead, the models are evaluated on the full data set minus the last forecast horizon of data. 
 
 
-
 ## Data Exploration & Visualisation
 
 ### Evaluating and selecting data API for historic data
@@ -48,17 +47,37 @@ Downloading the data for one ticker symbol through the API for a period of a yea
 
 The Date field is set as the index and inspection shows its loaded as a DatetimeIndex, conventient as this opens up out-of-the-box pandas time series functions like the `window()` and `resample()` functions
 
-After downloading the shape of the DataFrame was checked, where the expected number of rows should be 365, 1 row for each day, this returned 252. There are some missing rows. Closer inspectection on the data shows that its mostly weekends and some holidays that are missing, this makes sense as on theses days the stock market is closed.
+After downloading the shape of the DataFrame was checked, where the expected number of rows should be 365, 1 row for each day, this returned 252. There are some missing days of data. Closer inspectection on the data shows that its mostly weekends and some holidays that are missing, this makes sense as on theses days the stock market is closed. Using `resample()` the missing data was generated to ensure one data point per day, see [Data Preprocessing](#data-preprocessing) for more details.
 
 There are no duplicate date values, and all columns are floats with the only exception being the Volume, which is an integer. There are no missing values for the ticker symbol (`GOOG`) inspected.
 
+
+### Initial price estimates & prophet output
+For the forecasting/estimating of the prices the [facebook prophet](https://pypi.org/project/fbprophet/) package was used. The package expects as input a DataFrame with a `ds` column for the date and a `y` column for the value to be estimated. As mentioned [above](#historic-data-investigation) this fits perfectly with what we want to predict, namely the adjusted closing price for a stock.
+
+As the missing data was backfilled ([see Data Preprocessing](#data-preprocessing)]) the input data now has two columns with the Date (ds) and Adj Close (y) that we require to create an initial prediction and investigate the output.
+
+The estimator returns a pandas DataFrame with the following columns of interest:
+- ds; the date of the estimation
+- yhat; estimated value
+- yhat_lower & yhat_upper; lower and upper bound of the uncertainty interval
+
 ### Line graph visualisation
-As this is time series data with an interest in daily values, a line chart was selected to display both the historic and estimated data.
+As this is time series data with an interest in daily values, a line chart was selected to display both the historic and estimated data. See example below.
 
 ![alt text](assets/plotly_example_visualisation.png "MSFT ticker symbol example")
 
+The graph uses the 7-day moving average as the historic line and plots the daily estimated price as individual markers.
+
 
 ## Methodology
+
+### Picking a framework for the webapp
+Initally [FastAPI](https://fastapi.tiangolo.com/) was explored as the framework to use. FastAPI offers rapid development of webapps in python and as its based on Pydantic it comes with very strong documentation possibilities through OpenAPI documentation pages. For visualisation [bokeh](https://docs.bokeh.org/en/latest/index.html) had my interest for visualising the data. The bokeh python package is a wrapper around the very powerful D3 Javascript library, opening the possibilites for some fun visualisations like a OHLC or candlestick graph. This combination proved to be quite troublesome as bokeh has quite a steep learning curve and FastAPI as a webframework is relatively young so there aren't as many online resource available compared to the popular [Flask](https://flask.palletsprojects.com/en/2.0.x/).
+
+This quickly led to a refactor from FastAPI to Flask, but still with bokeh as the go to for visualising the graph. I was pretty set on getting a Candle stick graph up and running in the webapp and found some nice resources. After giving this a try for a while I decided to swap out bokeh for Plotly. bokeh required more javascript knowledge to get working in the webapp. This combined with the availability of online resources for Flask+Plotly supported the decision to swap out bokeh before I got in too deep.
+
+After giving the candle stick visualisation a go with Flask+Plotly it became clear that the webrendering template for Flask was lacking support for the candle stick graph. This required an approach to pre-render the full webpage or build a full backend server setup. This was outside of the scope of the current project, as the ML part also would requier some attention soon. This led to the decision of exposing the results as a line + scatter plot instead.
 
 
 ### Data Preprocessing
@@ -86,16 +105,6 @@ As this is time series data with an interest in daily values, a line chart was s
 
 ### Improvement
 
-
-
-
-
-### Picking a framework for the webapp
-Initally [FastAPI](https://fastapi.tiangolo.com/) was explored as the framework to use. FastAPI offers rapid development of webapps in python and as its based on Pydantic it comes with very strong documentation possibilities through OpenAPI documentation pages. For visualisation [bokeh](https://docs.bokeh.org/en/latest/index.html) had my interest for visualising the data. The bokeh python package is a wrapper around the very powerful D3 Javascript library, opening the possibilites for some fun visualisations like a OHLC or candlestick graph. This combination proved to be quite troublesome as bokeh has quite a steep learning curve and FastAPI as a webframework is relatively young so there aren't as many online resource available compared to the popular [Flask](https://flask.palletsprojects.com/en/2.0.x/).
-
-This quickly led to a refactor from FastAPI to Flask, but still with bokeh as the go to for visualising the graph. I was pretty set on getting a Candle stick graph up and running in the webapp and found some nice resources. After giving this a try for a while I decided to swap out bokeh for Plotly. bokeh required more javascript knowledge to get working in the webapp. This combined with the availability of online resources for Flask+Plotly supported the decision to swap out bokeh before I got in too deep.
-
-After giving the candle stick visualisation a go with Flask+Plotly it became clear that the webrendering template for Flask was lacking support for the candle stick graph. This required an approach to pre-render the full webpage or build a full backend server setup. This was outside of the scope of the current project, as the ML part also would requier some attention soon. This led to the decision of exposing the results as a line + scatter plot instead.
 
 
 
