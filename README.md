@@ -72,18 +72,85 @@ The graph uses the 7-day moving average as the historic line and plots the daily
 
 ## Methodology
 
-### Picking a framework for the webapp
+### Data Preprocessing
+Data preprocessing is only necessary on the historic data retrieved through the [Yahoo! Finance API](https://finance.yahoo.com/). As mentioned in [above](#historic-data-investigation), the data from the API suffers from missing days of data due to the stock markets being closed. To fill in the missing data  `resample('D')` was used to generate the missing days of data in the dataframe. This creates NULL values for the days with missing data. As the markets are closed on these days we assume the Adj close prices do not change during this days. Therefore we can use the last known value to fill the missing values, for this the `.ffill()` function is used to carry forward the last known closing prices.
+
+### Implementation
+The full project is implemented as a webapp and all steps, from data collection through forecasting all the way down to the visualisation is captured through the webapp. When initially launched the webapp displays a dropdown menu where a stock ticker symbol can be selected to retrieve the historic data and estimate the future values for said ticker. The main goal was to create a no code solution for users to get an idea of how their stock of interest could perform in the future. This means all complex logic is hidden from the frontend webapp.
+
+In the development process a series of Jupyter notebooks where used to prototype and design the data retrieval from both [Yahoo finance](working_documents/Yahoo%20finance.ipynb) and [Quandl](working_documents/Quandle%20test.ipynb) (for Quandle a wrapper was made to ensure the API would not be pushed to a public github repository). The [Yahoo notebook](working_documents/Yahoo%20finance.ipynb) was used to include tests of Plotly, facebook prophet and implementing a gridsearch to tune the parameters for prophet.
+
+The following sections discuss in more detail which decisions where made during the implementation.
+
+#### Picking a framework for the webapp
 Initally [FastAPI](https://fastapi.tiangolo.com/) was explored as the framework to use. FastAPI offers rapid development of webapps in python and as its based on Pydantic it comes with very strong documentation possibilities through OpenAPI documentation pages. For visualisation [bokeh](https://docs.bokeh.org/en/latest/index.html) had my interest for visualising the data. The bokeh python package is a wrapper around the very powerful D3 Javascript library, opening the possibilites for some fun visualisations like a OHLC or candlestick graph. This combination proved to be quite troublesome as bokeh has quite a steep learning curve and FastAPI as a webframework is relatively young so there aren't as many online resource available compared to the popular [Flask](https://flask.palletsprojects.com/en/2.0.x/).
 
 This quickly led to a refactor from FastAPI to Flask, but still with bokeh as the go to for visualising the graph. I was pretty set on getting a Candle stick graph up and running in the webapp and found some nice resources. After giving this a try for a while I decided to swap out bokeh for Plotly. bokeh required more javascript knowledge to get working in the webapp. This combined with the availability of online resources for Flask+Plotly supported the decision to swap out bokeh before I got in too deep.
 
 After giving the candle stick visualisation a go with Flask+Plotly it became clear that the webrendering template for Flask was lacking support for the candle stick graph. This required an approach to pre-render the full webpage or build a full backend server setup. This was outside of the scope of the current project, as the ML part also would requier some attention soon. This led to the decision of exposing the results as a line + scatter plot instead.
 
+#### The webapp subparts
+All of the python files needed to run the webapp are in the `.app/` folder, `main.py` has the Flask framework logic and ties together how the different subparts work together. The webapp has two different "states" which are determined by how the homepage is accessed. 
+- A GET request will produce a webpage with the dropdown to select a ticker symbol of choice
+- A POST request with the ticker symbol data will trigger the data download, forecast and eventually will display a table with the last 7 days of data plus a line graph with the full history 7-day rolling average and points for the 180 day forecast.
 
-### Data Preprocessing
-Data preprocessing is only necessary on the historic data retrieved through the [Yahoo! Finance API](https://finance.yahoo.com/). As mentioned in [above](#historic-data-investigation), the data from the API suffers from missing days of data due to the stock markets being closed. To fill in the missing data  `resample('D')` was used to generate the missing days of data in the dataframe. This creates NULL values for the days with missing data. As the markets are closed on these days we assume the Adj close prices do not change during this days. Therefore we can use the last known value to fill the missing values, for this the `.ffill()` function is used to carry forward the last known closing prices.
+The idea behind the current setup is to make it modular and work with protocols/contracts between each section. This enables the app to be extended or models to be swapped out without affecting the flow of the overall program.
 
-### Implementation
+All the functions have a doc string to understand in detail what they achieve. For completeness here is a summary:
+- **common.py**; contains common functions needed across the application
+- **data.py**; Logic to download the data from yahoo finance and preprocess, `get_clean_ticker_data()` gets the ticker data cleaned and enriched with 7-day rolling mean.
+  - `get_ticker_data()`; Download the ticker data from Yahoo finance
+  - `preprocess_ticker_data()`; Preprocess by filling missing days with last known values
+  - `enrich_ticker_data()`; Add 7-day rolling window, seperate function to allow easy extension
+- **forecast.py**; Implementation of facebook prophet. Requires a JSON file with params in `./params` to provide optimized model params.
+  - `forecast_data()`; Wrapper function to execute the forecast, renames forecast column to y and use index as date.
+  - `get_prophet_params()`; Gets the model params from [./params/prophet_params.json](./params/prophet_params.json)
+  - `forecast_with_prophet()`; Use the prophet params and input data to generate forecast
+- **graph.py**; Graphing logic for the webapp, should return a JSON representation Plotly JS understands.
+  - `generate_line_graph_json()`; Creates the line graph, adds a vertical line for today and adds the estimated values as points to the line graph. Sets the HoverTemplate for the objects to be plotted.
+
+
+All of the templates are in the [./app/templates](./app/templates/) folder. The app has a `layout.html`, as the name implies, it tells the app the actual layout. The `home.html` template extends the layout with more details on the actual content blocks to be populated.
+
+
+#### Notebook descriptions, working documents
+**[Quandle test](working_documents/Quandle%20test.ipynb)**:
+In this notebook the Quandl API was used to download a set of energy data and use the Bokeh python library to plot the information on a map of the United States. The Bokeh map was based on an public Dataset and demo on the World War II THOR data set. See [bokeh plot test - WWII THOR dataset](working_documents/Bokeh%20plot%20test%20-%20WWII%20THOR%20dataset.ipynb) for the notebook loading this data and making a simple Bokeh plot. To use the Quandle notebook a `.env` file is required in the root directory of the project with a value for `QUANDLE_API_KEY=<your_key_here>`, <u>this is not provided in the repo</u>. This prompted me to pick the Yahoo API over the Quandle API.
+
+The data in the Quandle and Bokeh use energy production data per state as the initial idea for the project was to implement a forecast around energy consumption and production in the US. The webapp then would function as a interactive dashboard to enrich some of the data with type of energy produced (green, oil, gas, coal), population size per state and some interesting supporting graphs like population growth vs increase in energy production. This migrated to the stock ticker due to the idea being a bit ambitious and the green production data I was looking for not being freely available in an online data store.
+
+**[Yahoo finance](./working_documents/Yahoo%20finance.ipynb)**:
+This notebook is the basis for the full project and as the project was moving along parts where split out and moved to their own sections. [Forecasting parameter tuning](./working_documents/Forecasting%20parameter%20tuning.ipynb) describes how facebook prophet was used in combination with a gridsearch to optimize the parameters per ticker symbol. [Create graph on forecasted data](working_documents/Create%20graph%20on%20forecasted%20data.ipynb) uses a csv data dump from the facebook prophet forecast to create a Plotly graph object with a combination of graphical objects and plotly express plotting.
+
+**Included datasets**:
+- World War II THOR dataset; See [reference documentation](https://programminghistorian.org/en/lessons/visualizing-with-bokeh#the-basics-of-bokeh) for more information on the dataset
+- Shapefiles; These are shapefiles for GeoPandas to create a map of the US with states to plot data. This is not being used in the actual application but it is still here as part of the brainstorming process.
+- seds_tpopp_all_states.txt; Reference from the Quandle API to get energy consumption data per state. 
+
+
+#### Training the forecast model with prophet
+To get the estimates [facebook prophet](https://pypi.org/project/fbprophet/) was used to estimate the value of stock tickers up to 180 days ahead. The data for a select set of tickers was downloaded:
+- `AAPL`; Apple
+- `GOOG`; Google
+- `MSFT`; Microsoft
+- `ADYEN.AS`; Adyen
+- `AMZN`; Amazon
+- `AGN.AS`; Aegon
+- `AKZA.AS`; AkzoNobel 
+- `ASML`; ASML
+- `GLPG`; Galapagos
+
+The selection for this tickers was made to a selection of a few large tech companies, assuming they would behave more or less the same when it comes to seasonal patterns in the data. To validate a few non-tech companies where included like Aegon, a large insurance company, Adyen (payment provider), AkzoNobel (manufactures performance coatings and paints) and Galapagos (bio-tech in medicine development). After selecting the ticker symbols the following steps where taken for each:
+- Download data for ticker symbol
+- Pre-process data and fit to Prophet model
+- Create estimates for the ticker
+- Evaluate model using a period of data that was left out, in this case 180 days
+
+The results for the default parameters ranged from very good (~10% MAPE) to very bad (~50% MAPE). After looking at the data this is where the decision was made to train the models per ticker symbol to get the best performing model per ticker. The different ticker symbols from different industries showed that they require a wildly different set of parameters to get some performance.
+
+During this initial fitting phase one of the parameters that turned out to be a strong contributer to prediction was the yearly seasonality. Yearly seasonality only works if there is atleast 1.5 years of data available. **This is why the minimum start date by default is set to 2019-01-01** for the retrieve data function.
+
+The next step was to use a grid search to identify a general range for param optimisation. For more on this please read [Forecasting parameter tuning](forecasting_parameter_tuning.md) The Mean Abosolute Percentage Error (`MAPE`) was used to evaluate model performance during the grid search. See [Metrics](#metrics) for the formula.
 
 
 ### Refinement
@@ -105,16 +172,6 @@ Data preprocessing is only necessary on the historic data retrieved through the 
 
 ### Improvement
 
-
-
-
-### Forcasting analysis
-- For the forecasting of the stock prices the [facebook prophet](https://pypi.org/project/fbprophet/) package was used.
-- Grid search to identify a general range for param optimisation. For more on this please read [Forecasting parameter tuning](forecasting_parameter_tuning.md)
-
-The Mean Abosolute Percentage Error (`MAPE`) was used to evaluate model performance. 
-
-#### Short comings of the current approach
 The current forecasting approach is very naïve as it only looks at historic adjusted closing rates and ignores any forms of reports, quarterly updates from the companies or prospects shared by the company. Next to this it only forecasts the expected adjusted close value for the stocks, which does not take into account scheduled divident payouts or stock splits, which influcence the adjusted closing price.
 
 Additionally, the stock market reacts to what is going on in the world. Not only Governments introducting laws, taxes or results from elections but also wars, natural disasters and the overall confidence in the economy by "we, the people" all have their influnce on the stock markets. None of these are currently included in the model, assuming they don't operate on some interesting seasonal pattern.
