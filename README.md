@@ -38,8 +38,15 @@ For the ML part of the project [facebook prophet](https://pypi.org/project/fbpro
 Estimate the Adjusted Close price of stock based on historical daily trading data over a certain date range. The stock ticker symbol and date range are input for the model to return estimated prices.
 
 ### Metrics
-To evaluate the model performance the Mean Absolute Percentage Error (MAPE) score was used.
+To evaluate the model performance the Mean Absolute Percentage Error (MAPE) score was used. The MAPE score was selected over Root Mean Squared Error (RMSE), Mean Squared Error (MSE) and Mean Abosolute Error (MAE) as it fit best for this particular project. The MAPE score is easy to understand, especially when placed in the context of stock prices. The percentage error here makes sense, as overall portfolio performance is also reported in percentage gained or lost.
 
+As each stock was trained on its own model (see [Training the forecast model with prophet](#training-the-forecast-model-with-prophet) for more info) the MAPE score is very easy to compare between the different stocks. As the stocks prices can differ in the overall range they report in (`GOOG` for example is a lot more expensive than `GLPG`) making the MAE and MSE, not reporting in ratios but in actual number, blow the error on the high value stocks out of proportion.
+
+The RMSE score suffers from the same issue, as it uses the value of the error directly it makes it hard to compare the error across different stock tickers. Again, as the models are fitted towards single stocks, it becomes hard to compare the comparison across the models based on quantified numbers over ratios or percentage errors.
+
+Using the MAPE opens up adding additional information to the visualisation in the language the user expects, percentages. For this particular timeseries optimisation the MAPE score also doesn't suffer from some of its pitfalls, like not being able to handle division by 0.
+
+MAPE formula:
 ![alt text](assets/mape_score_formula.png "MAPE score formula")
 - *n* being the number of times the summation iteration happens
 - *A<sub>t</sub>* the actual value
