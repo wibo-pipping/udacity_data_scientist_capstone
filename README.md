@@ -69,6 +69,34 @@ After downloading the shape of the DataFrame was checked, where the expected num
 
 There are no duplicate date values, and all columns are floats with the only exception being the Volume, which is an integer. There are no missing values for the ticker symbol (`GOOG`) inspected.
 
+#### Exploring different stock tickers
+For this step 2 years of data for a selection of ticker symbols was downloaded (see table for which ticker symbols). Using the `describe()` function on the adjusted close data shows different data point counts, different mean values and different min and max values, that differ quite greatly. This might be a potential issue in training a generic model if we don't rescale the data.
+
+|       |   AAPL |   ADYEN.AS |   AGN.AS |   AKZA.AS |    AMZN |   ASML |   GLPG |    GOOG |   MSFT |
+|:------|-------:|-----------:|---------:|----------:|--------:|-------:|-------:|--------:|-------:|
+| count | 505    |     514    |   514    |    514    |  505    | 505    | 505    |  505    | 505    |
+| mean  | 103.87 |    1451.04 |     3.11 |     85.64 | 2770.68 | 444.36 | 142.51 | 1761.51 | 207.09 |
+| std   |  30.10 |     589.74 |     0.69 |     12.38 |  643.69 | 176.91 |  58.95 |  503.24 |  45.99 |
+| min   |  53.54 |     570.00 |     1.46 |     46.50 | 1676.61 | 194.67 |  54.97 | 1056.62 | 131.92 |
+| 25%   |  73.96 |     821.95 |     2.47 |     79.82 | 2009.29 | 292.10 |  82.19 | 1372.56 | 167.39 |
+| 50%   | 114.24 |    1474.50 |     3.35 |     84.61 | 3104.00 | 374.67 | 138.50 | 1541.44 | 209.06 |
+| 75%   | 128.20 |    1908.07 |     3.64 |     92.81 | 3272.71 | 585.87 | 199.84 | 2095.38 | 240.44 |
+| max   | 156.69 |    2776.00 |     4.24 |    107.80 | 3731.41 | 889.33 | 274.03 | 2916.84 | 305.22 |
+
+Creating a simple plot shows how big the differences actually are between the different tickers. Note that the data for the plot was transformed using:
+```python
+adj_close = (df['Adj Close']
+             .fillna(method='ffill', axis=0) # Backfill initial missing days per row
+             .resample('D') # Resample, fills in missng days
+             .fillna(method='ffill') # Fill na the newly generated row. This function is a resampler so does not support axis argument
+            )
+
+# Add the rolling 7 day window
+adj_close.rolling(7).mean());
+```
+
+![7 day rolling window](./assets/eda_plot_7d_rolling_tickers.png)
+
 
 ### Initial price estimates & prophet output
 For the forecasting/estimating of the prices the [facebook prophet](https://pypi.org/project/fbprophet/) package was used. The package expects as input a DataFrame with a `ds` column for the date and a `y` column for the value to be estimated. As mentioned [above](#historic-data-investigation) this fits perfectly with what we want to predict, namely the adjusted closing price for a stock.
