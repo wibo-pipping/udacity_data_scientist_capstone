@@ -86,9 +86,9 @@ For this step 2 years of data for a selection of ticker symbols was downloaded (
 Creating a simple plot shows how big the differences actually are between the different tickers. Note that the data for the plot was transformed using:
 ```python
 adj_close = (df['Adj Close']
-             .fillna(method='ffill', axis=0) # Backfill initial missing days per row
+             .fillna(method='ffill', axis=0) # Backfill initial missing days per row, DataFrame ffill
              .resample('D') # Resample, fills in missing days
-             # Fill na the newly generated row. This function is a resampler so does not support axis argument
+        # Fill na the newly generated row. This is a resampler so no axis argument support
              .fillna(method='ffill') 
             )
 
