@@ -87,8 +87,9 @@ Creating a simple plot shows how big the differences actually are between the di
 ```python
 adj_close = (df['Adj Close']
              .fillna(method='ffill', axis=0) # Backfill initial missing days per row
-             .resample('D') # Resample, fills in missng days
-             .fillna(method='ffill') # Fill na the newly generated row. This function is a resampler so does not support axis argument
+             .resample('D') # Resample, fills in missing days
+             # Fill na the newly generated row. This function is a resampler so does not support axis argument
+             .fillna(method='ffill') 
             )
 
 # Add the rolling 7 day window
